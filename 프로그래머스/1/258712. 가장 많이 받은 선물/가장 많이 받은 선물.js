@@ -1,41 +1,41 @@
 function solution(friends, gifts) {
-    const mapping = {};
-    const n = friends.length
-    const matrix = Array.from({length:n}, () => Array(n).fill(0));
-    const gaveCount = Array(n).fill(0);
-    const receivedCount = Array(n).fill(0);
-    const nextMonthCount = Array(n).fill(0);
-    
-    friends.forEach((friend,i) => {
-        mapping[friend] = i
-    })
-    gifts.forEach((gift) => {
-        const [a,b] = gift.split(" ");
-        const giveIdx = mapping[a];
-        const takeIdx = mapping[b];
-        
-        gaveCount[giveIdx]++;
-        receivedCount[takeIdx]++;
-        matrix[giveIdx][takeIdx]++;
-    })
-    const giftIndices = gaveCount.map((gave,i)=> {
-        return gave - receivedCount[i];
-    })
+  const mapping = {}
+  const length = friends.length
+  const matrix = Array.from({length}, () => Array(length).fill(0));
+  const nextMonthCount = Array(length).fill(0)
+  const giveCount = Array(length).fill(0)
+  const takeCount = Array(length).fill(0)
 
-    for(let i = 0; i < n; i++) {
-        for(let j = i+1; j < n; j++) {
-            if(matrix[i][j] > matrix[j][i]) {
-                nextMonthCount[i]++
-            } else if (matrix[i][j] < matrix[j][i]) {
-                nextMonthCount[j]++
-            } else {
-                if(giftIndices[i] > giftIndices[j]) {
-                    nextMonthCount[i]++
-                } else if (giftIndices[i] < giftIndices[j]) {
-                    nextMonthCount[j]++
-                }
-            }
+  friends.forEach((friend,i) => {
+    mapping[friend] = i;
+  })
+
+  gifts.forEach((gift) => {
+    const [giver, taker] = gift.split(" ");
+    const giveIdx = mapping[giver];
+    const takeIdx = mapping[taker];
+
+    matrix[giveIdx][takeIdx]++;
+    giveCount[giveIdx]++
+    takeCount[takeIdx]++
+  })
+
+  const giftIndices = giveCount.map((give,i) => give - takeCount[i])
+
+  for(let i = 0; i < length; i++) {
+    for(let j = i+1; j < length; j++) {
+      if(matrix[i][j] > matrix[j][i]) {
+        nextMonthCount[i]++
+      } else if (matrix[j][i] > matrix[i][j]) {
+        nextMonthCount[j]++
+      } else {
+        if(giftIndices[i] > giftIndices[j]) {
+          nextMonthCount[i]++;
+        } else if(giftIndices[j] > giftIndices[i]) {
+          nextMonthCount[j]++;
         }
+      }
     }
-    return Math.max(...nextMonthCount);
+  }
+  return Math.max(...nextMonthCount)
 }
